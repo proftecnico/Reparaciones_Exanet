@@ -620,7 +620,7 @@
 
         // --- LOGIN ---
         window.intentarLogin = function (rol) {
-            if (rol === 'tecnico' && prompt("Clave TÃ©cnico:") !== "1234") return;
+            if (rol === 'tecnico' && prompt("Clave Técnico:") !== "1234") return;
             if (rol === 'supervisor' && prompt("Clave Supervisor:") !== "admin") return;
             rolActual = rol.charAt(0).toUpperCase() + rol.slice(1);
             if (rolActual === 'Tecnico') rolActual = 'TÃ©cnico';
@@ -824,6 +824,7 @@
 </body>
 
 </html>
+
 
 
 
