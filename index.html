@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestión de Flota - NVR</title>
+    <title>GestiÃ³n de Flota - NVR</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,7 @@
         href='data:application/manifest+json,{"name":"Gestion Flota NVR","short_name":"Flota NVR","display":"standalone","start_url":".","background_color":"#ffffff","theme_color":"#0d6efd","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/741/741407.png","sizes":"512x512","type":"image/png"}]}'>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/741/741407.png">
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚛</text></svg>">
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>ðŸš›</text></svg>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
@@ -366,7 +366,7 @@
     <div id="pantalla-login">
         <div class="card card-login animate-enter">
             <div class="text-center mb-4 login-header">
-                <div class="mb-3" style="font-size: 3.5rem; text-shadow: 0 0 20px rgba(13,110,253,0.5);">🚛</div>
+                <div class="mb-3" style="font-size: 3.5rem; text-shadow: 0 0 20px rgba(13,110,253,0.5);">ðŸš›</div>
                 <h3>Control de Flota NVR</h3>
                 <p>Ingrese para gestionar unidades con NVR</p>
             </div>
@@ -379,13 +379,13 @@
             <button onclick="intentarLogin('tecnico')" class="login-role-card role-tecnico">
                 <div class="icon-wrapper"><i class="fas fa-wrench"></i></div>
                 <div>
-                    <h5>Técnico Exanet</h5><span>Gestionar reparaciones</span>
+                    <h5>TÃ©cnico Exanet</h5><span>Gestionar reparaciones</span>
                 </div>
             </button>
             <button onclick="intentarLogin('supervisor')" class="login-role-card role-supervisor">
                 <div class="icon-wrapper"><i class="fas fa-user-shield"></i></div>
                 <div>
-                    <h5>Supervisor</h5><span>Administración total</span>
+                    <h5>Supervisor</h5><span>AdministraciÃ³n total</span>
                 </div>
             </button>
         </div>
@@ -395,9 +395,9 @@
         <nav class="navbar navbar-custom sticky-top">
             <div class="container">
                 <div class="d-flex align-items-center">
-                    <span style="font-size: 1.5rem;" class="me-2">🚛</span>
+                    <span style="font-size: 1.5rem;" class="me-2">ðŸš›</span>
                     <div>
-                        <h5 class="m-0 fw-bold text-dark">Gestión Flota - NVR</h5>
+                        <h5 class="m-0 fw-bold text-dark">GestiÃ³n Flota - NVR</h5>
                         <span class="badge bg-light text-secondary border" id="badgeRolUsuario">Rol: --</span>
                     </div>
                 </div>
@@ -440,10 +440,10 @@
                                         <label class="form-label fw-bold text-danger">3. Prioridad</label>
                                         <select class="form-select" id="selectorPrioridad" required>
                                             <option value="">-- Seleccionar prioridad --</option>
-                                            <option value="baja">🟢 Baja</option>
-                                            <option value="media">🟡 Media</option>
-                                            <option value="alta">🟠 Alta</option>
-                                            <option value="urgente">🔴 Urgente</option>
+                                            <option value="baja">ðŸŸ¢ Baja</option>
+                                            <option value="media">ðŸŸ¡ Media</option>
+                                            <option value="alta">ðŸŸ  Alta</option>
+                                            <option value="urgente">ðŸ”´ Urgente</option>
                                         </select>
                                     </div>
                                     <div class="col-12" id="panelFallas" style="display:none;">
@@ -501,15 +501,15 @@
                     </div>
                 </div>
 
-                <!-- CHAT / ASIGNACIÓN (DERECHA) -->
+                <!-- CHAT / ASIGNACIÃ“N (DERECHA) -->
                 <div class="col-lg-5">
                     <div class="chat-nvr-container">
                         <div class="chat-nvr-header">
-                            <span><i class="fas fa-comments me-2"></i>Chat de Programación y Tareas</span>
+                            <span><i class="fas fa-comments me-2"></i>Chat de ProgramaciÃ³n y Tareas</span>
                             <span class="badge bg-primary">Online</span>
                         </div>
                         <div class="chat-nvr-messages" id="chatNVREventos">
-                            <!-- Mensajes aquí -->
+                            <!-- Mensajes aquÃ­ -->
                         </div>
                         <div class="chat-nvr-input-area">
                             <div class="input-group">
@@ -548,7 +548,7 @@
                             <div class="col-md-6">
                                 <p><strong>Unidad:</strong> <span id="detalleUnidad"></span></p>
                                 <p><strong>Fecha/Hora:</strong> <span id="detalleFechaHora"></span></p>
-                                <p><strong>Reportó:</strong> <span id="detalleUsuario"></span></p>
+                                <p><strong>ReportÃ³:</strong> <span id="detalleUsuario"></span></p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Prioridad:</strong> <span id="detallePrioridad"></span></p>
@@ -558,7 +558,7 @@
                             </div>
                         </div>
                         <hr>
-                        <h6>Observación:</h6>
+                        <h6>ObservaciÃ³n:</h6>
                         <p id="detalleObs" class="fst-italic text-muted"></p>
                         <hr>
                         <h6>Historial de Chat de la Unidad:</h6>
@@ -620,10 +620,10 @@
 
         // --- LOGIN ---
         window.intentarLogin = function (rol) {
-            if (rol === 'tecnico' && prompt("Clave Técnico:") !== "1234") return;
+            if (rol === 'tecnico' && prompt("Clave TÃ©cnico:") !== "1234") return;
             if (rol === 'supervisor' && prompt("Clave Supervisor:") !== "admin") return;
             rolActual = rol.charAt(0).toUpperCase() + rol.slice(1);
-            if (rolActual === 'Tecnico') rolActual = 'Técnico';
+            if (rolActual === 'Tecnico') rolActual = 'TÃ©cnico';
             document.getElementById('pantalla-login').style.display = 'none';
             document.getElementById('pantalla-app').style.display = 'block';
             document.getElementById('badgeRolUsuario').innerText = rolActual;
@@ -709,7 +709,7 @@
                 hora: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
                 estado: "Pendiente", usuario: rolActual
             }).then(() => {
-                mostrarToast("�?Reporte NVR enviado", "success");
+                mostrarToast("âœ?Reporte NVR enviado", "success");
                 document.getElementById('reporteForm').reset();
                 document.getElementById('panelFallas').style.display = 'none';
             });
@@ -762,15 +762,15 @@
         };
 
         window.completar = function (key) {
-            if (confirm("¿Marcar como completado?")) {
+            if (confirm("Â¿Marcar como completado?")) {
                 update(ref(db, 'reparaciones/' + key), { estado: "Completado" });
-                mostrarToast("�?Unidad reparada", "success");
+                mostrarToast("âœ?Unidad reparada", "success");
             }
         };
 
         window.eliminarReporte = function (key) {
-            if (confirm("¿Eliminar este reporte permanentemente?")) {
-                remove(ref(db, 'reparaciones/' + key)).then(() => mostrarToast("🗑�?Reporte eliminado", "success"));
+            if (confirm("Â¿Eliminar este reporte permanentemente?")) {
+                remove(ref(db, 'reparaciones/' + key)).then(() => mostrarToast("ðŸ—‘ï¸?Reporte eliminado", "success"));
             }
         };
 
@@ -793,7 +793,7 @@
             const isMe = msg.usuario === rolActual;
             const html = `<div class="chat-bubble-nvr ${isMe ? 'me' : 'other'}" data-chat-key="${key}">
                 <div class="chat-meta-nvr">
-                    <span>${msg.usuario} �?${msg.hora}</span>
+                    <span>${msg.usuario} â€?${msg.hora}</span>
                     ${rolActual === 'Supervisor' ? `<i class="fas fa-trash-alt ms-2 text-danger" style="cursor:pointer;" onclick="eliminarMensajeChat('${key}')"></i>` : ''}
                 </div>
                 <div>${msg.texto}</div>
@@ -803,8 +803,8 @@
         }
 
         window.eliminarMensajeChat = function (key) {
-            if (confirm("¿Eliminar este mensaje?")) {
-                remove(ref(db, `chat_nvr/${key}`)).then(() => mostrarToast("🗑�?Mensaje eliminado", "success"));
+            if (confirm("Â¿Eliminar este mensaje?")) {
+                remove(ref(db, `chat_nvr/${key}`)).then(() => mostrarToast("ðŸ—‘ï¸?Mensaje eliminado", "success"));
             }
         };
 
