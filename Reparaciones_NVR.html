@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gesti贸n de Flota - NVR</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="manifest"
+        href='data:application/manifest+json,{"name":"Gestion Flota NVR","short_name":"Flota NVR","display":"standalone","start_url":".","background_color":"#ffffff","theme_color":"#0d6efd","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/741/741407.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/741/741407.png">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>馃殯</text></svg>">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            /* Light Theme (Default) */
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+
+            --primary: hsl(220, 90%, 56%);
+            --success: hsl(142, 71%, 45%);
+            --danger: hsl(354, 70%, 54%);
+            --warning: hsl(45, 100%, 51%);
+            --info: hsl(190, 90%, 50%);
+
+            --prioridad-baja: hsl(142, 71%, 45%);
+            --prioridad-media: hsl(45, 100%, 51%);
+            --prioridad-alta: hsl(27, 98%, 54%);
+            --prioridad-urgente: hsl(354, 70%, 54%);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-body: #1a1d21;
+            --bg-card: #212529;
+            --text-main: #f8f9fa;
+            --text-muted: #adb5bd;
+            --border-color: #343a40;
+            --input-bg: #2b3035;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark Mode Overrides */
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .modal-content,
+        [data-theme="dark"] .list-group-item,
+        [data-theme="dark"] .navbar,
+        [data-theme="dark"] .bg-white {
+            background-color: var(--bg-card) !important;
+            color: var(--text-main);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select,
+        [data-theme="dark"] #contenedorCheckboxes .form-check {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        [data-theme="dark"] .text-dark {
+            color: var(--text-main) !important;
+        }
+
+        [data-theme="dark"] .table {
+            color: var(--text-main);
+            --bs-table-color: var(--text-main);
+            --bs-table-bg: transparent;
+        }
+
+        [data-theme="dark"] .table-light {
+            background-color: #2c3034;
+            color: var(--text-main);
+            --bs-table-bg: #2c3034;
+        }
+
+        /* ANIMACIONES */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .modal.show .modal-dialog {
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* ESTILOS VISUALES */
+        .fuera-servicio {
+            background-color: #ffe6e6 !important;
+            color: #dc3545;
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+
+        .table-responsive {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 10px;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #343a40;
+            color: white;
+            z-index: 2;
+            border: none;
+        }
+
+        tr {
+            transition: transform 0.2s ease, background-color 0.2s;
+        }
+
+        /* UI GENERAL */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        /* CHAT BOX STYLES */
+        .chat-nvr-container {
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .chat-nvr-header {
+            padding: 15px;
+            background: #343a40;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-nvr-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        [data-theme="dark"] .chat-nvr-messages {
+            background: #2b3035;
+        }
+
+        .chat-nvr-input-area {
+            padding: 15px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-bubble-nvr {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-bubble-nvr.me {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-bubble-nvr.other {
+            align-self: flex-start;
+            background-color: white;
+            color: #212529;
+            border: 1px solid #dee2e6;
+            border-bottom-left-radius: 2px;
+        }
+
+        [data-theme="dark"] .chat-bubble-nvr.other {
+            background-color: #343a40;
+            color: white;
+            border-color: #495057;
+        }
+
+        .chat-meta-nvr {
+            font-size: 0.7rem;
+            margin-bottom: 3px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        /* LOGIN (Simplified for this page or shared) */
+        #pantalla-login {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .card-login {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem !important;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-role-card {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            color: white;
+            width: 100%;
+            text-align: left;
+        }
+
+        .login-role-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .role-reportador .icon-wrapper {
+            background: rgba(13, 202, 240, 0.2);
+            color: #0dcaf0;
+        }
+
+        .role-tecnico .icon-wrapper {
+            background: rgba(25, 135, 84, 0.2);
+            color: #198754;
+        }
+
+        .role-supervisor .icon-wrapper {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        /* PRIORIDADES */
+        tr.fila-urgente {
+            border-left: 4px solid var(--prioridad-urgente) !important;
+        }
+
+        tr.fila-alta {
+            border-left: 4px solid var(--prioridad-alta) !important;
+        }
+
+        tr.fila-media {
+            border-left: 4px solid var(--prioridad-media) !important;
+        }
+
+        tr.fila-baja {
+            border-left: 4px solid var(--prioridad-baja) !important;
+        }
+
+        @media (max-width: 991px) {
+            .chat-nvr-container {
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="pantalla-login">
+        <div class="card card-login animate-enter">
+            <div class="text-center mb-4 login-header">
+                <div class="mb-3" style="font-size: 3.5rem; text-shadow: 0 0 20px rgba(13,110,253,0.5);">馃殯</div>
+                <h3>Control de Flota NVR</h3>
+                <p>Ingrese para gestionar unidades con NVR</p>
+            </div>
+            <button onclick="intentarLogin('reportador')" class="login-role-card role-reportador">
+                <div class="icon-wrapper"><i class="fas fa-file-invoice"></i></div>
+                <div>
+                    <h5>Reportador AESA</h5><span>Crear nuevos reportes</span>
+                </div>
+            </button>
+            <button onclick="intentarLogin('tecnico')" class="login-role-card role-tecnico">
+                <div class="icon-wrapper"><i class="fas fa-wrench"></i></div>
+                <div>
+                    <h5>T茅cnico Exanet</h5><span>Gestionar reparaciones</span>
+                </div>
+            </button>
+            <button onclick="intentarLogin('supervisor')" class="login-role-card role-supervisor">
+                <div class="icon-wrapper"><i class="fas fa-user-shield"></i></div>
+                <div>
+                    <h5>Supervisor</h5><span>Administraci贸n total</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <div id="pantalla-app" style="display:none;">
+        <nav class="navbar navbar-custom sticky-top">
+            <div class="container">
+                <div class="d-flex align-items-center">
+                    <span style="font-size: 1.5rem;" class="me-2">馃殯</span>
+                    <div>
+                        <h5 class="m-0 fw-bold text-dark">Gesti贸n Flota - NVR</h5>
+                        <span class="badge bg-light text-secondary border" id="badgeRolUsuario">Rol: --</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button onclick="toggleTheme()" class="btn btn-link nav-link p-2" id="themeToggle"><i
+                            class="fas fa-moon fs-5"></i></button>
+                    <button onclick="cerrarSesion()" class="btn btn-outline-danger shadow-sm"><i
+                            class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid px-4 pb-5">
+            <div class="row">
+                <!-- FORMULARIO DE REPORTE (Opcional o arriba) -->
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div
+                            class="card-header bg-primary text-white bg-gradient d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-plus-circle me-2"></i>Nuevo Reporte NVR</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="reporteForm">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-secondary">1. Grupo (NVR)</label>
+                                        <select class="form-select" id="selectorGrupo"
+                                            onchange="cargarUnidades('principal')" required>
+                                            <option value="">-- Seleccionar --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-secondary">2. Unidad</label>
+                                        <select class="form-select" id="selectorUnidad" onchange="cargarOpcionesFalla()"
+                                            disabled required>
+                                            <option value="">-- Primero elija grupo --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-danger">3. Prioridad</label>
+                                        <select class="form-select" id="selectorPrioridad" required>
+                                            <option value="">-- Seleccionar prioridad --</option>
+                                            <option value="baja">馃煝 Baja</option>
+                                            <option value="media">馃煛 Media</option>
+                                            <option value="alta">馃煚 Alta</option>
+                                            <option value="urgente">馃敶 Urgente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12" id="panelFallas" style="display:none;">
+                                        <label class="form-label fw-bold text-danger mb-2">4. Fallas:</label>
+                                        <div id="contenedorCheckboxes" class="d-flex flex-wrap gap-2"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea id="observaciones" class="form-control" rows="1"
+                                            placeholder="Observaciones adicionales..."></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-success w-100 shadow-sm"><i
+                                                class="fas fa-paper-plane me-2"></i>Enviar Reporte</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- TABLA DE REPARACIONES (IZQUIERDA) -->
+                <div class="col-lg-7">
+                    <div class="card h-100">
+                        <div
+                            class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Reparaciones NVR</h5>
+                            <div class="input-group input-group-sm" style="max-width: 200px;">
+                                <span class="input-group-text bg-secondary text-white border-0"><i
+                                        class="fas fa-search"></i></span>
+                                <input type="text" id="busquedaTabla" class="form-control border-0"
+                                    placeholder="Buscar...">
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 text-center align-middle" id="tablaReportes">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Unidad</th>
+                                            <th>Fallas</th>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaCuerpo" class="bg-white"></tbody>
+                                </table>
+                            </div>
+                            <div id="loading" class="text-center p-5 text-muted">
+                                <div class="spinner-border text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT / ASIGNACI脫N (DERECHA) -->
+                <div class="col-lg-5">
+                    <div class="chat-nvr-container">
+                        <div class="chat-nvr-header">
+                            <span><i class="fas fa-comments me-2"></i>Chat de Programaci贸n y Tareas</span>
+                            <span class="badge bg-primary">Online</span>
+                        </div>
+                        <div class="chat-nvr-messages" id="chatNVREventos">
+                            <!-- Mensajes aqu铆 -->
+                        </div>
+                        <div class="chat-nvr-input-area">
+                            <div class="input-group">
+                                <input type="text" id="inputChatNVR" class="form-control"
+                                    placeholder="Escribir mensaje o tarea..."
+                                    onkeypress="if(event.key==='Enter') enviarMensajeNVR()">
+                                <button class="btn btn-primary" onclick="enviarMensajeNVR()"><i
+                                        class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="toastNotificacion" class="toast align-items-center text-white border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body"></div><button type="button" class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DETALLES (Similar al original pero simplificado si es necesario) -->
+        <div class="modal fade" id="modalDetalles" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold" id="detalleTitulo">Detalles del Reporte</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Unidad:</strong> <span id="detalleUnidad"></span></p>
+                                <p><strong>Fecha/Hora:</strong> <span id="detalleFechaHora"></span></p>
+                                <p><strong>Report贸:</strong> <span id="detalleUsuario"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Prioridad:</strong> <span id="detallePrioridad"></span></p>
+                                <p><strong>Fallas:</strong>
+                                <div id="detalleFallas"></div>
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>Observaci贸n:</h6>
+                        <p id="detalleObs" class="fst-italic text-muted"></p>
+                        <hr>
+                        <h6>Historial de Chat de la Unidad:</h6>
+                        <div id="chatUnidadHistorial" class="p-3 bg-light rounded"
+                            style="max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, update, remove, onChildAdded, onChildChanged, onChildRemoved, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // --- CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVeuhJt3jdlkGcLr0nvuJA4qZldZp0eXw",
+            authDomain: "gestionflota-ea461.firebaseapp.com",
+            databaseURL: "https://gestionflota-ea461-default-rtdb.firebaseio.com",
+            projectId: "gestionflota-ea461",
+            storageBucket: "gestionflota-ea461.firebasestorage.app",
+            messagingSenderId: "43528636288",
+            appId: "1:43528636288:web:c8a9f3f740bcfb7e856365"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'reparaciones');
+        const dbFlotaRef = ref(db, 'estado_flota');
+        const dbChatRef = ref(db, 'chat_nvr'); // Nuevo nodo para chat NVR
+
+        let rolActual = "";
+        let mapaBajas = {};
+        const configFlota = [
+            { label: "Serie 1000 A (1016-1081)", min: 1016, max: 1081, caps: ["NVR"] },
+            { label: "Serie 1100 (1121-1150)", min: 1121, max: 1150, caps: ["NVR"] },
+            { label: "Serie 1700 (1704-1727)", min: 1704, max: 1727, caps: ["NVR"] },
+            { label: "Serie 1900 (1902-1927)", min: 1902, max: 1927, caps: ["NVR"] }
+        ];
+
+        // --- THEME ---
+        window.toggleTheme = function () {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        };
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            btn.innerHTML = theme === 'dark' ? '<i class="fas fa-sun fs-5 text-warning"></i>' : '<i class="fas fa-moon fs-5 text-secondary"></i>';
+        }
+        updateThemeIcon(localStorage.getItem('theme') || 'light');
+        document.body.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+
+        // --- LOGIN ---
+        window.intentarLogin = function (rol) {
+            if (rol === 'tecnico' && prompt("Clave T茅cnico:") !== "1234") return;
+            if (rol === 'supervisor' && prompt("Clave Supervisor:") !== "admin") return;
+            rolActual = rol.charAt(0).toUpperCase() + rol.slice(1);
+            if (rolActual === 'Tecnico') rolActual = 'T茅cnico';
+            document.getElementById('pantalla-login').style.display = 'none';
+            document.getElementById('pantalla-app').style.display = 'block';
+            document.getElementById('badgeRolUsuario').innerText = rolActual;
+            iniciarEscuchas();
+        };
+        window.cerrarSesion = function () { location.reload(); };
+
+        // --- CORE LOGIC ---
+        function iniciarEscuchas() {
+            // Cargar grupos NVR
+            const selectGrupo = document.getElementById('selectorGrupo');
+            configFlota.forEach((g, i) => selectGrupo.appendChild(new Option(g.label, i)));
+
+            // Bajas
+            onValue(dbFlotaRef, (snap) => { mapaBajas = snap.val() || {}; });
+
+            // Reparaciones (Filtradas por NVR)
+            onChildAdded(dbRef, (snap) => {
+                const data = snap.val();
+                if (data.fallas && data.fallas.includes('NVR')) {
+                    crearFila(snap.key, data);
+                    document.getElementById('loading').style.display = 'none';
+                }
+            });
+            onChildChanged(dbRef, (snap) => {
+                const data = snap.val();
+                if (data.fallas && data.fallas.includes('NVR')) {
+                    const row = document.getElementById(snap.key);
+                    if (row) row.remove();
+                    crearFila(snap.key, data);
+                }
+            });
+            onChildRemoved(dbRef, (snap) => {
+                const row = document.getElementById(snap.key);
+                if (row) row.remove();
+            });
+
+            // Chat NVR
+            onChildAdded(dbChatRef, (snap) => {
+                agregarMensajeChat(snap.key, snap.val());
+            });
+            onChildRemoved(dbChatRef, (snap) => {
+                const msgEl = document.querySelector(`[data-chat-key="${snap.key}"]`);
+                if (msgEl) msgEl.remove();
+            });
+        }
+
+        window.cargarUnidades = function () {
+            const idx = document.getElementById('selectorGrupo').value;
+            const selectU = document.getElementById('selectorUnidad');
+            selectU.innerHTML = '<option value="">-- Seleccionar --</option>';
+            if (idx === "") { selectU.disabled = true; return; }
+            const g = configFlota[idx];
+            selectU.disabled = false;
+            for (let i = g.min; i <= g.max; i++) {
+                const num = i.toString().padStart(4, '0');
+                const opt = new Option(num, num);
+                if (mapaBajas[num]) { opt.text += " (BAJA)"; opt.disabled = true; }
+                selectU.appendChild(opt);
+            }
+        };
+
+        window.cargarOpcionesFalla = function () {
+            const idx = document.getElementById('selectorGrupo').value;
+            const cont = document.getElementById('contenedorCheckboxes');
+            cont.innerHTML = "";
+            document.getElementById('panelFallas').style.display = 'block';
+            configFlota[idx].caps.forEach(cap => {
+                cont.insertAdjacentHTML('beforeend', `<div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="fallas" value="${cap}" id="chk_${cap}" ${cap === 'NVR' ? 'checked disabled' : ''}><label class="form-check-label ps-2" for="chk_${cap}">${cap}</label></div>`);
+            });
+        };
+
+        document.getElementById('reporteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('selectorUnidad').value;
+            const p = document.getElementById('selectorPrioridad').value;
+            const obs = document.getElementById('observaciones').value;
+            const fallas = Array.from(document.querySelectorAll('input[name="fallas"]:checked')).map(c => c.value);
+
+            push(dbRef, {
+                unidad: u, fallas: fallas, observaciones: obs, prioridad: p,
+                fecha: new Date().toLocaleDateString('es-AR'),
+                hora: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+                estado: "Pendiente", usuario: rolActual
+            }).then(() => {
+                mostrarToast("鉁?Reporte NVR enviado", "success");
+                document.getElementById('reporteForm').reset();
+                document.getElementById('panelFallas').style.display = 'none';
+            });
+        });
+
+        function crearFila(key, data) {
+            let badges = data.fallas.map(f => `<span class="badge rounded-pill bg-info text-dark border shadow-sm small m-1">${f}</span>`).join('');
+            let colPrioridad = data.prioridad === 'urgente' ? 'fila-urgente' : data.prioridad === 'alta' ? 'fila-alta' : data.prioridad === 'media' ? 'fila-media' : 'fila-baja';
+
+            const html = `<tr id="${key}" class="${colPrioridad} ${data.estado === 'Completado' ? 'table-success opacity-75' : ''}">
+                <td class="fw-bold">${data.unidad}</td>
+                <td>${badges}</td>
+                <td>${data.fecha}<br><small class="text-muted">${data.hora}</small></td>
+                <td><span class="badge rounded-pill ${data.estado === 'Completado' ? 'bg-success' : 'bg-secondary'}">${data.estado}</span></td>
+                <td>
+                    <button onclick="verDetalles('${key}')" class="btn btn-sm btn-outline-info" title="Ver detalles"><i class="fas fa-eye"></i></button>
+                    ${data.estado !== 'Completado' ? `<button onclick="completar('${key}')" class="btn btn-sm btn-outline-success" title="Completar"><i class="fas fa-check"></i></button>` : ''}
+                    ${rolActual === 'Supervisor' ? `<button onclick="eliminarReporte('${key}')" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="fas fa-trash-alt"></i></button>` : ''}
+                </td>
+            </tr>`;
+            document.getElementById('tablaCuerpo').insertAdjacentHTML('afterbegin', html);
+        }
+
+        window.verDetalles = function (key) {
+            get(ref(db, 'reparaciones/' + key)).then(snap => {
+                const d = snap.val();
+                document.getElementById('detalleUnidad').innerText = d.unidad;
+                document.getElementById('detalleFechaHora').innerText = `${d.fecha} ${d.hora}`;
+                document.getElementById('detalleUsuario').innerText = d.usuario;
+                document.getElementById('detallePrioridad').innerText = d.prioridad.toUpperCase();
+                document.getElementById('detalleObs').innerText = d.observaciones || "Sin observaciones";
+                document.getElementById('detalleFallas').innerHTML = d.fallas.map(f => `<span class="badge bg-info text-dark m-1">${f}</span>`).join('');
+
+                // Filtrar chat para esta unidad
+                const hist = document.getElementById('chatUnidadHistorial');
+                hist.innerHTML = "";
+                get(dbChatRef).then(chatSnap => {
+                    if (chatSnap.exists()) {
+                        chatSnap.forEach(child => {
+                            const msg = child.val();
+                            if (msg.texto.includes(d.unidad)) {
+                                hist.insertAdjacentHTML('beforeend', `<div class="small border-bottom mb-1"><strong>${msg.usuario}:</strong> ${msg.texto} <br><small class="text-muted">${msg.hora}</small></div>`);
+                            }
+                        });
+                    }
+                });
+
+                new bootstrap.Modal(document.getElementById('modalDetalles')).show();
+            });
+        };
+
+        window.completar = function (key) {
+            if (confirm("驴Marcar como completado?")) {
+                update(ref(db, 'reparaciones/' + key), { estado: "Completado" });
+                mostrarToast("鉁?Unidad reparada", "success");
+            }
+        };
+
+        window.eliminarReporte = function (key) {
+            if (confirm("驴Eliminar este reporte permanentemente?")) {
+                remove(ref(db, 'reparaciones/' + key)).then(() => mostrarToast("馃棏锔?Reporte eliminado", "success"));
+            }
+        };
+
+        // --- CHAT NVR ---
+        window.enviarMensajeNVR = function () {
+            const input = document.getElementById('inputChatNVR');
+            const txt = input.value.trim();
+            if (!txt) return;
+
+            push(dbChatRef, {
+                usuario: rolActual,
+                texto: txt,
+                hora: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+                unix: Date.now()
+            }).then(() => { input.value = ""; });
+        };
+
+        function agregarMensajeChat(key, msg) {
+            const cont = document.getElementById('chatNVREventos');
+            const isMe = msg.usuario === rolActual;
+            const html = `<div class="chat-bubble-nvr ${isMe ? 'me' : 'other'}" data-chat-key="${key}">
+                <div class="chat-meta-nvr">
+                    <span>${msg.usuario} 鈥?${msg.hora}</span>
+                    ${rolActual === 'Supervisor' ? `<i class="fas fa-trash-alt ms-2 text-danger" style="cursor:pointer;" onclick="eliminarMensajeChat('${key}')"></i>` : ''}
+                </div>
+                <div>${msg.texto}</div>
+            </div>`;
+            cont.insertAdjacentHTML('beforeend', html);
+            cont.scrollTop = cont.scrollHeight;
+        }
+
+        window.eliminarMensajeChat = function (key) {
+            if (confirm("驴Eliminar este mensaje?")) {
+                remove(ref(db, `chat_nvr/${key}`)).then(() => mostrarToast("馃棏锔?Mensaje eliminado", "success"));
+            }
+        };
+
+        function mostrarToast(msg, tipo = "info") {
+            const t = document.getElementById('toastNotificacion');
+            t.querySelector('.toast-body').innerText = msg;
+            t.className = `toast align-items-center text-white border-0 bg-${tipo}`;
+            new bootstrap.Toast(t).show();
+        }
+
+        document.getElementById('busquedaTabla').addEventListener('input', function () {
+            const val = this.value.toLowerCase();
+            document.querySelectorAll('#tablaCuerpo tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
+        });
+
+    </script>
+</body>
+
+</html>
