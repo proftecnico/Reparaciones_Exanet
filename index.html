@@ -438,13 +438,13 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-bold text-danger">3. Prioridad</label>
-                                        <select class="form-select" id="selectorPrioridad" required>
-                                            <option value="">-- Seleccionar prioridad --</option>
-                                            <option value="baja">ðŸŸ¢ Baja</option>
-                                            <option value="media">ðŸŸ¡ Media</option>
-                                            <option value="alta">ðŸŸ  Alta</option>
-                                            <option value="urgente">ðŸ”´ Urgente</option>
-                                        </select>
+                                        <select class="form-select form-select-lg is-valid" id="selectorPrioridad" required="">
+                                <option value="">-- Seleccionar prioridad --</option>
+                                <option value="baja">🟢 Baja - Puede esperar</option>
+                                <option value="media">🟡 Media - Normal</option>
+                                <option value="alta">🟠 Alta - Importante</option>
+                                <option value="urgente">🔴 Urgente - Crítico</option>
+                            </select>
                                     </div>
                                     <div class="col-12" id="panelFallas" style="display:none;">
                                         <label class="form-label fw-bold text-danger mb-2">4. Fallas:</label>
@@ -824,6 +824,7 @@
 </body>
 
 </html>
+
 
 
 
